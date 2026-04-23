@@ -1,3 +1,5 @@
+import java.util.*;
+
 public class Unit {
     public int level, hp, mv, hpToNextLevel;
 
@@ -12,6 +14,22 @@ public class Unit {
     public CombatArt[] combatArtsKnown = new CombatArt[6];
 
     public Item[] inventory = new Item[6];
+
+    public Vector2 screenPosition;
+    public Tile tile;
+
+    public Unit(int st, int ma, int de, int sp, int lc, int deff, int re, int ch, Vector2 sPos) {
+        baseStr = st;
+        baseMag = ma;
+        baseDex = de;
+        baseSpd = sp;
+        baseLck = lc;
+        baseDef = deff;
+        baseRes = re;
+        baseCha = ch;
+
+        screenPosition = sPos;
+    }
 
     public void calcBaseSoftStats() {
         if(heldWeapon.weaponType.equals("Magic")) {
@@ -47,86 +65,35 @@ public class Unit {
         critAvo = lck;
     }
 
-    public void PreviewAttack(Unit target) {
-        calcBaseSoftStats();
-        
-        // damage that will actually be done
-        int damage;
-        if(heldWeapon.weaponType.equals("Magic")) {
-            damage = atk - target.rsl;
-        } else {
-            damage = atk - target.prt;
-        }
-
-        // chance that damage will actually hit
-        int displayedHit = hit - target.avo;
-
-        // chance that damage will crit
-        int displayedCrit = crit - target.critAvo;
-
-        // number of times unit will attack
-        int numberOfHits = 1;
-        if(as - 4 > target.as) {
-            numberOfHits *= 2;
-        }
-
-
-        target.calcBaseSoftStats();
-        // damage that will actually be done by the other unit
-        int targetDamage;
-        if(heldWeapon.weaponType.equals("Magic")) {
-            targetDamage = target.atk - rsl;
-        } else {
-            targetDamage = target.atk - prt;
-        }
-
-        // chance that damage will actually hit from the other unit
-        int targetDisplayedHit = target.hit - avo;
-
-        // chance that damage will crit from the other unit
-        int targetDisplayedCrit = target.crit - critAvo;
-
-        // number of times the other unit will make an attack
-        int targetNumberOfHits = 1;
-
-
-        // wait for player input
-        if(true) {
-            // start battle
-            Battle(this, damage, displayedHit, displayedCrit, numberOfHits, target, targetDamage, targetDisplayedHit, targetDisplayedCrit, targetNumberOfHits);
-        } else {
-            // cancel preview
-        }
+    public void FindPosition(TileGrid grid) {
+        // uses screen coords to find position on grid
+        //tile = grid.ScreenCoordToTile(screenPosition);
     }
 
-    public void Battle(Unit attacker, int damage, int displayedHit, int displayedCrit, int numberOfHits, Unit target, int targetDamage, int targetDisplayedHit, int targetDisplayedCrit, int targetNumberOfHits) {
-        // attacking unit first
-        target.hp -= damage;
-        if(target.hp < 0) {return;}
-        if(attacker.heldWeapon.weaponType.equals("Gauntlet")) {
-            // attack again
-            target.hp -= damage;
-            if(target.hp < 0) {return;}
-        }
+    public void GetLocalCoordsWithinDistance(int distance) {
+        // set that the function will check next
+        ArrayList<Vector2> openSet = new ArrayList<Vector2>();
 
-        // defending unit next
-        attacker.hp -= targetDamage;
-        if(hp < 0) {return;}
-        if(target.heldWeapon.weaponType.equals("Gauntlet")) {
-            // attack again
-            attacker.hp -= targetDamage;
-            if(hp < 0) {return;}
-        }
+        // tiles we already have checked
+        ArrayList<Vector2> closedSet = new ArrayList<Vector2>();
 
-        // if attack speed is four higher than defender, attack again
-        if(numberOfHits == 2) {
-            target.hp -= damage;
-            if(target.hp < 0) {return;}
-            if(attacker.heldWeapon.weaponType.equals("Gauntlet")) {
-                target.hp -= damage;
-                if(target.hp < 0) {return;}
+        // tiles we will check next loop
+        ArrayList<Vector2> queuedSet = new ArrayList<Vector2>();
+
+        openSet.add(new Vector2(0,0));
+        // use range to loop function
+        for(int i = 0; i < distance; i++) {
+            
+            // loop to check every index in openSet
+            for(int ii = 0; ii < openSet.size(); ii++) {
+
+                // loop to check a potential index of queuedSet against every index in closedSet
+                for(int iii = 0; iii < closedSet.size(); iii++) {
+                    if(new Vector2(openSet.get(ii).x, openSet.get(ii).y).Equals(closedSet.get(iii))) {return;}
+                }
             }
         }
-        
     }
+
+
 }

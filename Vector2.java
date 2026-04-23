@@ -3,9 +3,9 @@ public class Vector2 {
     public double x;
     public double y;
 
-    public Vector2(double nx, double ny) {
-        x = nx;
-        y = ny;
+    public Vector2(double x, double y) {
+        this.x = x;
+        this.y = y;
     }
 
     public Vector2() {
@@ -14,10 +14,10 @@ public class Vector2 {
     }
 
     // adding two vectors together
-    public static Vector2 Add(Vector2 first, Vector2 second) {
+    public Vector2 Add(Vector2 addend) {
         Vector2 temp = new Vector2();
-        temp.x = first.x + second.x;
-        temp.y = first.y + second.y;
+        temp.x = x + addend.x;
+        temp.y = y + addend.y;
         return temp;
     }
 
@@ -26,5 +26,12 @@ public class Vector2 {
         x *= scaleFactor;
         y *= scaleFactor;
         return this;
+    }
+
+    public boolean Equals(Vector2 vect2) {
+        boolean xtrue = false, ytrue = false;
+        if(x == vect2.x) {xtrue = true;}
+        if(y == vect2.y) {ytrue = true;}
+        return xtrue && ytrue;
     }
 }
