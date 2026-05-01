@@ -1,6 +1,10 @@
 import java.util.ArrayList;
 
 public class TileGrid {
+
+    // jframe the whole game runs off of
+    public MainFrame frame;
+
     // how big the grid is in screen size
     public Vector2 worldSize;
 
@@ -62,7 +66,18 @@ public class TileGrid {
         return grid[(int)coords.x][(int)coords.y];
     }
 
-    public ArrayList<Tile> GetTilesWithinDistance(int distance, Tile startTile) {
+    public boolean TileInDistance(Tile tile, int distance) {
+        ArrayList<Tile> allTilesInRange = GetTilesWithinDistance(tile, distance);
+
+        for(Tile tileToCheck : allTilesInRange) {
+            // potential failure point if .Equals() doesn't work
+            if(tileToCheck.Equals(tile)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    public ArrayList<Tile> GetTilesWithinDistance(Tile startTile, int distance) {
         // basic function:
         // 1. start with some tiles that are for sure in range in openset
         // 2. for every tile in openset, extend one tile in every cardinal direction, and add them to queuedset
