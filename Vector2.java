@@ -1,11 +1,18 @@
 public class Vector2 {
     // 2D position/vector coordinate object
+    // use a Vector2 to represent any two coordinate thing, mainly a point on the tileGrid or frame space, or a two dimensional vector on the tileGrid or frame space.
+
     public double x;
     public double y;
+
+    public double sqrMagnitude;
+
+    public static Vector2 zero = new Vector2(0, 0);
 
     public Vector2(double x, double y) {
         this.x = x;
         this.y = y;
+        sqrMagnitude = Math.pow(x, 2) + Math.pow(y, 2);
     }
 
     public Vector2() {

@@ -1,4 +1,6 @@
 import java.util.ArrayList;
+import java.awt.Image;
+import javax.swing.ImageIcon;
 
 public class TileGrid {
 
@@ -26,11 +28,12 @@ public class TileGrid {
     // grid of tiles 
     public Tile[][] grid;
 
-    public TileGrid(Vector2 nWorldSize, Vector2 center, int nRadius) {
+    public TileGrid(MainFrame f, Vector2 nWorldSize, Vector2 center, int nRadius) {
         worldSize = nWorldSize;
         gridCenter = center;
         radius = nRadius;
-        diameter *= radius;
+        diameter = 2 * radius;
+        frame = f;
 
         // determining amount of tiles per row/column
         gridSizeX = (int)worldSize.x / diameter;
@@ -44,12 +47,18 @@ public class TileGrid {
         worldBottomLeft.y -= worldSize.y / 2;
 
         // setting up grid
+        ImageIcon icon = new ImageIcon("UI\\defaultTile.png");
+        Image image = icon.getImage();
+        image = image.getScaledInstance(2 * radius, 2 * radius, Image.SCALE_FAST);
+        icon = new ImageIcon( image );
+
         for(int r = 0; r < gridSizeX; r++) {
             for(int c = 0; c < gridSizeY; c++) {
                 // creating and setting position of tiles
-                grid[r][c] = new Tile(new Vector2(worldBottomLeft.x + (diameter * r) + radius, worldBottomLeft.y + (diameter * c) + radius), new Vector2(r, c));
+                grid[r][c] = new Tile(new Vector2(worldBottomLeft.x + (diameter * r) + radius, worldBottomLeft.y + (diameter * c) + radius), new Vector2(r, c), this, icon);
             }
         }
+        //frame.repaint();
     }
 
     public Tile FrameCoordToTile(Vector2 frameCoord) {
@@ -117,7 +126,7 @@ public class TileGrid {
                 }
 
                 // if not invalid for any reason, queue the tile
-                if(isInvalid = false) {
+                if(isInvalid == false) {
                     queuedSet.add(up);
                 }
 
@@ -134,7 +143,7 @@ public class TileGrid {
                 }
 
                 // if not invalid for any reason, queue the tile
-                if(isInvalid = false) {
+                if(isInvalid == false) {
                     queuedSet.add(right);
                 }
 
@@ -151,7 +160,7 @@ public class TileGrid {
                 }
 
                 // if not invalid for any reason, queue the tile
-                if(isInvalid = false) {
+                if(isInvalid == false) {
                     queuedSet.add(down);
                 }
 
@@ -168,7 +177,7 @@ public class TileGrid {
                 }
 
                 // if not invalid for any reason, queue the tile
-                if(isInvalid = false) {
+                if(isInvalid == false) {
                     queuedSet.add(left);
                 }
                 

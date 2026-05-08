@@ -14,6 +14,11 @@ public class PlayerController extends MouseAdapter {
     public boolean tileMode;
     public Unit unit;
 
+    // speed units move in the movement animation
+    public double moveSpeed;
+    // how fast the animation delays between runs
+    public double animRate = 0;
+
     public void SetGrid(TileGrid g) {
         grid = g;
         tileMode = true;
@@ -58,28 +63,56 @@ public class PlayerController extends MouseAdapter {
     }
 
     public void Move(Unit unit, Tile targetTile) {
+        // call this to move a unit from one tile to another
+        // everything is built in, calling MoveAnimation separately isn't needed
         Tile startTile = unit.tile;
         double changeInX = targetTile.framePosition.x - startTile.framePosition.x;
         double changeInY = targetTile.framePosition.y - startTile.framePosition.y;
 
         unit.tile = targetTile;
-        if(changeInY < changeInX) {
-            MoveAnimation(changeInY, changeInX);
-        } else {
-            MoveAnimation(changeInX, changeInY);
-        }
+        MoveAnimation(unit, new Vector2(changeInX, changeInY));
     }
 
-    public void MoveAnimation(double first, double second) {
+    public void MoveAnimation(Unit unit, Vector2 distanceToMove) {
+        // called in Move()
+        // animation to move unit from one tile to another
         java.util.Timer timer = new java.util.Timer();
+        MoveAnimationTimerTask task = new MoveAnimationTimerTask(unit, new Vector2(0, moveSpeed), timer);
+        
+        task.distanceTotalToMove = new Vector2(0, distanceToMove.y);
+        task.distanceTotalMoved = Vector2.zero;
+        timer.schedule(task, 0l, (long)animRate);
     }
 
     public class MoveAnimationTimerTask extends TimerTask{
+        // created in MoveAnimation
+        // incremental method that gets repeated to move the unit, TimerTask scheduled in MoveAnimation
         Unit unitToMove;
         Vector2 distanceToMove;
-        public void run() {
-            unitToMove.framePosition = unitToMove.framePosition.Add(distanceToMove);
+        public Vector2 distanceTotalToMove;
+        public Vector2 distanceTotalMoved;
+        public java.util.Timer timer;
+
+        public MoveAnimationTimerTask(Unit u, Vector2 d, java.util.Timer t) {
+            unitToMove = u;
+            distanceToMove = d;
+            timer = t;
         }
+        public void run() {
+            if(distanceTotalMoved.Equals(distanceTotalToMove)) {
+                timer.cancel();
+            }
+
+            if(distanceToMove.sqrMagnitude > distanceTotalToMove.sqrMagnitude - distanceTotalMoved.sqrMagnitude) {
+                // if the distance the anim would move is greater than what the total distance wants, just move to the total distance instead.
+                unitToMove.framePosition = unitToMove.framePosition.Add(distanceTotalToMove.Add(distanceTotalMoved.ScaleFactor(-1)));
+                distanceTotalMoved = distanceTotalToMove;
+                return;
+            }
+            unitToMove.framePosition = unitToMove.framePosition.Add(distanceToMove);
+            distanceTotalMoved = distanceTotalMoved.Add(distanceToMove);
+        }
+
     }
 
     public void DisplayRangeOfUnit(Unit unit) {
