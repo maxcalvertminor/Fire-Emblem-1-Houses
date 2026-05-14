@@ -17,28 +17,35 @@ public class PlayerController extends MouseAdapter {
     // speed units move in the movement animation
     public double moveSpeed;
     // how fast the animation delays between runs
-    public double animRate = 0;
+    public double animRate = 10;
 
+    public PlayerController(MainFrame fr, double speed) {
+        frame = fr;
+        moveSpeed = speed;
+    }
     public void SetGrid(TileGrid g) {
         grid = g;
         tileMode = true;
+        //System.out.println("Grid is set");
     }
 
-    public void MouseClicked(MouseEvent mouseEvent) {
+    public void mouseClicked(MouseEvent mouseEvent) {
         if(tileMode == true) {
             Tile tile = grid.FrameCoordToTile(new Vector2(mouseEvent.getX(), mouseEvent.getY()));
-
+            System.out.println(tile);
             // if the tile clicked on has a unit
             if(tile.unitOnTile != null) {
                 if(unit == null) {
                     // set selected unit if there is no current selected unit
                     unit = tile.unitOnTile;
-
+                    System.out.println(unit);
                     // make cancel button visible to clear selected unit
                 } else if(unit != null) {
                     // if there is a selected unit, and another unit is clicked, move to and attack that unit
                     tileMode = false;
                     PreviewAttack(unit, tile.unitOnTile);
+                    unit = null;
+                    tile = null;
                 }
             // else if the tile is empty/no unit  
             } else {
@@ -49,9 +56,19 @@ public class PlayerController extends MouseAdapter {
                     // menu options should at least be: end turn, map, exit
                 } else if(unit != null) {
                     // if a unit is selected, check movement and if all good, move to that tile
-                    if(grid.TileInDistance(unit.tile, unit.mv)) {
+                    System.out.println("Movestep 1");
+                    Move(unit, tile);
+                    unit = null;
+                    tile = null;
+                    /*if(grid.TileInDistance(unit.tile, unit.mv)) {
                         Move(unit, tile);
-                    }
+                        unit = null;
+                        tile = null;
+                    } else {
+                        System.out.println("Out of range");
+                        unit = null;
+                        tile = null;
+                    }*/
                     
                 } 
             }
@@ -63,17 +80,19 @@ public class PlayerController extends MouseAdapter {
     }
 
     public void Move(Unit unit, Tile targetTile) {
+        System.out.println("Movestep 2");
         // call this to move a unit from one tile to another
         // everything is built in, calling MoveAnimation separately isn't needed
         Tile startTile = unit.tile;
         double changeInX = targetTile.framePosition.x - startTile.framePosition.x;
         double changeInY = targetTile.framePosition.y - startTile.framePosition.y;
+        System.out.println(new Vector2(changeInX, changeInY));
 
-        unit.tile = targetTile;
         MoveAnimation(unit, new Vector2(changeInX, changeInY));
     }
 
     public void MoveAnimation(Unit unit, Vector2 distanceToMove) {
+        System.out.println("Movestep 3");
         // called in Move()
         // animation to move unit from one tile to another
         java.util.Timer timer = new java.util.Timer();
@@ -81,7 +100,7 @@ public class PlayerController extends MouseAdapter {
         
         task.distanceTotalToMove = new Vector2(0, distanceToMove.y);
         task.distanceTotalMoved = Vector2.zero;
-        timer.schedule(task, 0l, (long)animRate);
+        timer.schedule(task, 0, (long)animRate);
     }
 
     public class MoveAnimationTimerTask extends TimerTask{
@@ -97,9 +116,13 @@ public class PlayerController extends MouseAdapter {
             unitToMove = u;
             distanceToMove = d;
             timer = t;
+            System.out.println(distanceToMove);
         }
         public void run() {
+            //System.out.println("Task running, progress: " + distanceTotalMoved + " / " + distanceTotalToMove);
+            //System.out.println(distanceTotalMoved.Equals(distanceTotalToMove));
             if(distanceTotalMoved.Equals(distanceTotalToMove)) {
+                unitToMove.RefreshPosition();
                 timer.cancel();
             }
 
@@ -107,10 +130,12 @@ public class PlayerController extends MouseAdapter {
                 // if the distance the anim would move is greater than what the total distance wants, just move to the total distance instead.
                 unitToMove.framePosition = unitToMove.framePosition.Add(distanceTotalToMove.Add(distanceTotalMoved.ScaleFactor(-1)));
                 distanceTotalMoved = distanceTotalToMove;
+                unitToMove.RefreshPosition();
                 return;
             }
             unitToMove.framePosition = unitToMove.framePosition.Add(distanceToMove);
             distanceTotalMoved = distanceTotalMoved.Add(distanceToMove);
+            unitToMove.RefreshPosition();
         }
 
     }

@@ -41,4 +41,8 @@ public class Vector2 {
         if(y == vect2.y) {ytrue = true;}
         return xtrue && ytrue;
     }
+
+    public String toString() {
+        return "( " + x + ", " + y + " )";
+    }
 }

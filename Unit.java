@@ -1,9 +1,17 @@
+import java.awt.Color;
 import java.util.*;
+import javax.swing.*;
+import java.awt.Image;
 
-public class Unit {
+public class Unit extends JLabel{
 
     // jframe the whole game runs off of
     public MainFrame frame;
+
+    public String name;
+
+    // grid the unit is attached to
+    public TileGrid grid;
 
     // mv is movement, rest is hopefully self explanatory 
     public int level, hp, mv, xpToNextLevel;
@@ -29,12 +37,18 @@ public class Unit {
     // position in terms of the frame, rather than screen or local
     public Vector2 framePosition;
 
+    // position in terms of the grid, rather than the frame
+    public Vector2 gridPosition;
+
     public Vector2 uiPosition;
 
     // tile this unit is currently on
     public Tile tile;
 
-    public Unit(int st, int ma, int de, int sp, int lc, int deff, int re, int ch, Vector2 sPos) {
+    public Unit(MainFrame fr, String name, int st, int ma, int de, int sp, int lc, int deff, int re, int ch, TileGrid gr) {
+        frame = fr;
+        this.name = name;
+
         baseStr = st;
         baseMag = ma;
         baseDex = de;
@@ -44,7 +58,16 @@ public class Unit {
         baseRes = re;
         baseCha = ch;
 
-        framePosition = sPos;
+        grid = gr;
+
+        mv = 10;
+
+        ImageIcon icon = new ImageIcon("UI\\player.png");
+        Image image = icon.getImage();
+        image = image.getScaledInstance(2 * grid.radius, 2 * grid.radius, Image.SCALE_FAST);
+        icon = new ImageIcon( image );
+        frame.add(this);
+        setIcon(icon);
     }
 
     public void calcBaseSoftStats() {
@@ -81,9 +104,22 @@ public class Unit {
         critAvo = lck;
     }
 
-    public void FindPosition(TileGrid grid) {
-        // uses screen coords to find position on grid
-        //tile = grid.ScreenCoordToTile(screenPosition);
+    public void RefreshPosition() {
+        //System.out.println("Refreshed");
+        tile.unitOnTile = null;
+        tile = grid.FrameCoordToTile(framePosition);
+        tile.unitOnTile = this;
+        setBounds((int)framePosition.x - grid.radius, (int)framePosition.y - grid.radius, grid.diameter, grid.diameter);
+    }
+
+    public void SetGridPosition(Vector2 gridCoords) {
+        tile = grid.GridCoordToTile(gridCoords);
+        tile.unitOnTile = this;
+        gridPosition = gridCoords;
+        framePosition = tile.framePosition;
+
+        // setting up UI
+        setBounds((int)framePosition.x - grid.radius, (int)framePosition.y - grid.radius, grid.diameter, grid.diameter);
     }
 
     public void GetLocalCoordsWithinDistance(int distance) {
@@ -111,13 +147,7 @@ public class Unit {
         }
     }
 
-    //-----------------------------------------------------------
-    // INCOMPLETE
-    // this is the section for the jLabel that represents player
-
-
-    
-    //-----------------------------------------------------------
-
-
+    public String toString() {
+        return name;
+    }
 }

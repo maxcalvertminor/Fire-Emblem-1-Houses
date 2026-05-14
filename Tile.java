@@ -25,4 +25,9 @@ public class Tile extends JLabel{
         if(otherTile.gridPosition.y != gridPosition.y) {temp = false;}
         return temp;
     }
+
+    public String toString() {
+        return "" + 
+        gridPosition;
+    }
 }
