@@ -4,7 +4,7 @@ import java.awt.Toolkit;
 public class Main {
     public static void main(String[] args) {
         MainFrame frame = new MainFrame();
-        PlayerController controller = new PlayerController(frame, 10);
+        PlayerController controller = new PlayerController(frame, 1);
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         int width = (int)screenSize.getWidth();

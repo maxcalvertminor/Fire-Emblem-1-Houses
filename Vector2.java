@@ -5,19 +5,20 @@ public class Vector2 {
     public double x;
     public double y;
 
-    public double sqrMagnitude;
-
     public static Vector2 zero = new Vector2(0, 0);
 
     public Vector2(double x, double y) {
         this.x = x;
         this.y = y;
-        sqrMagnitude = Math.pow(x, 2) + Math.pow(y, 2);
     }
 
     public Vector2() {
         x = 0;
         y = 0;
+    }
+    
+    public double SqrMagnitude() {
+        return x*x + y*y;
     }
 
     // adding two vectors together
@@ -30,9 +31,7 @@ public class Vector2 {
 
     // multiply a vector by a constant multiplier
     public Vector2 ScaleFactor(double scaleFactor) {
-        x *= scaleFactor;
-        y *= scaleFactor;
-        return this;
+        return new Vector2(x*scaleFactor, y*scaleFactor);
     }
 
     public boolean Equals(Vector2 vect2) {

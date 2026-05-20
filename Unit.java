@@ -58,6 +58,8 @@ public class Unit extends JLabel{
         baseRes = re;
         baseCha = ch;
 
+        heldWeapon = new Unarmed();
+
         grid = gr;
 
         mv = 10;
